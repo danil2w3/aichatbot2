@@ -9,7 +9,6 @@ export default authMiddleware({
   
     if (!auth.userId && protectedPages.includes(pathname)) {
       const signInUrl = new URL('/auth/sign-in', req.url);
-      signInUrl.searchParams.set('redirect_url', req.url);
       return Response.redirect(signInUrl);
     }
   }
