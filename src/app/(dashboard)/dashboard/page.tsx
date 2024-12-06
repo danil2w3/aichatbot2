@@ -93,7 +93,7 @@ const Page = async (props: Props) => {
                     ${transaction.amount / 100}
                   </p>
                 </div>
-              ))} : [<p className="text-sm">Stripe не подключен</p>]
+              ))}
           </div>
         </div>
       </div>
