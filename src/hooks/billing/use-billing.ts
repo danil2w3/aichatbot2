@@ -12,6 +12,8 @@ import {
 } from '@stripe/react-stripe-js'
 import { useRouter } from 'next/navigation'
 
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000'
+
 export const useStripe = () => {
   const [onStripeAccountPending, setOnStripeAccountPending] =
     useState<boolean>(false)
@@ -77,7 +79,7 @@ export const useCompleteCustomerPayment = (onNext: () => void) => {
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: 'http://localhost:3000/settings',
+          return_url: `${BASE_URL}/settings`,
         },
         redirect: 'if_required',
       })
@@ -182,7 +184,7 @@ export const useCompletePayment = (
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: 'http://localhost:3000/settings',
+          return_url: `${BASE_URL}/settings`,
         },
         redirect: 'if_required',
       })
