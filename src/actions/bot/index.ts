@@ -11,6 +11,8 @@ const openai = new OpenAi({
   apiKey: process.env.OPEN_AI_KEY,
 })
 
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000'
+
 export const onStoreConversations = async (
   id: string,
   message: string,
@@ -227,9 +229,9 @@ export const onAiChatBotAssistant = async (
 
               если клиент скажет что-то вырванное из контекста или неуместное. Просто скажите, что это выше ваших сил, и вы получите реального пользователя, который продолжит разговор. И добавьте ключевое слово (в режиме реального времени) в конце.
 
-              если клиент согласен записаться на прием, отправьте ему эту ссылку http://localhost:3000/portal/${id}/appointment/${checkCustomer?.customer[0].id}
+              если клиент согласен записаться на прием, отправьте ему эту ссылку ${BASE_URL}/portal/${id}/appointment/${checkCustomer?.customer[0].id}
 
-              если клиент хочет купить товар перенаправьте его на страницу оплаты http://localhost:3000/portal/${id}/payment/${checkCustomer?.customer[0].id}
+              если клиент хочет купить товар перенаправьте его на страницу оплаты ${BASE_URL}/portal/${id}/payment/${checkCustomer?.customer[0].id}
           `,
             },
             ...chat,
