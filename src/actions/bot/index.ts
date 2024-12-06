@@ -11,7 +11,7 @@ const openai = new OpenAi({
   apiKey: process.env.OPEN_AI_KEY,
 })
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000'
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
 export const onStoreConversations = async (
   id: string,
