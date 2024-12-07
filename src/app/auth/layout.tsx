@@ -11,7 +11,7 @@ type Props = {
 const Layout = async ({ children }: Props) => {
   const user = await currentUser()
 
-  if (user) redirect('/')
+  if (user) redirect('/dashboard')
 
   return (
     <div className="h-screen flex w-full justify-center">
