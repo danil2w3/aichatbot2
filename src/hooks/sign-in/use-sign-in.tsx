@@ -2,7 +2,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { UserLoginProps, UserLoginSchema } from '@/schemas/auth.schema'
 import { useSignIn } from '@clerk/nextjs'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -28,11 +28,11 @@ export const useSignInForm = () => {
 
         if (authenticated.status === 'complete') {
           await setActive({ session: authenticated.createdSessionId })
+          router.push('/dashboard')
           toast({
             title: 'Success',
             description: 'С возвращением!',
           })
-          router.push('/dashboard')
         }
       } catch (error: any) {
         setLoading(false)
