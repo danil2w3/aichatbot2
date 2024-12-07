@@ -6,7 +6,7 @@ import {
 } from '@/schemas/auth.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useSignUp } from '@clerk/nextjs'
-import { useRouter } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { onCompleteUserRegistration } from '@/actions/auth'
@@ -15,7 +15,7 @@ export const useSignUpForm = () => {
   const { toast } = useToast()
   const [loading, setLoading] = useState<boolean>(false)
   const { signUp, isLoaded, setActive } = useSignUp()
-  const router = useRouter()
+  // const router = useRouter()
   const methods = useForm<UserRegistrationProps>({
     resolver: zodResolver(UserRegistrationSchema),
     defaultValues: {
@@ -77,7 +77,7 @@ export const useSignUpForm = () => {
             })
 
             setLoading(false)
-            router.push('/dashboard')
+            redirect('/dashboard')
           }
 
           if (registered?.status == 400) {
