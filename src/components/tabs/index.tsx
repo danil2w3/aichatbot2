@@ -18,7 +18,7 @@ const TabsMenu = ({ triggers, children, className, button }: Props) => {
       defaultValue={triggers[0].label}
       className="w-full"
     >
-      <TabsList className={cn('pr-5', className)}>
+      <TabsList className={cn('pr-5 flex-shrink flex-wrap', className)}>
         {triggers.map((trigger, key) => (
           <TabsTrigger
             key={key}
