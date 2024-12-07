@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form'
 export const useSignInForm = () => {
   const { isLoaded, setActive, signIn } = useSignIn()
   const [loading, setLoading] = useState<boolean>(false)
-  const router = useRouter()
+  // const router = useRouter()
   const { toast } = useToast()
   const methods = useForm<UserLoginProps>({
     resolver: zodResolver(UserLoginSchema),
