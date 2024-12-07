@@ -10,11 +10,13 @@ type Props = {}
 const ConversationPage = async (props: Props) => {
   const domains = await onGetAllAccountDomains()
   return (
-    <div className="w-full h-full flex">
-      <ConversationMenu domains={domains?.domains} />
+    <div className="max-h-3xl max-w-screen-x1 md:w-full md:h-full flex flex-col h-1/5 md:flex-row md:h-1/2">
+      <div>
+        <ConversationMenu domains={domains?.domains} />
+      </div>
 
       <Separator orientation="vertical" />
-      <div className="w-full flex flex-col">
+      <div className="md:w-full flex flex-col">
         <div className="px-5">
           <InfoBar />
         </div>

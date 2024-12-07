@@ -66,7 +66,7 @@ const EmailMarketing = ({ campaign, domains, subscription }: Props) => {
         id={isId}
       />
       <div>
-        <div className="flex gap-3 justify-end">
+        <div className="flex flex-wrap gap-3 justify-end">
           <Button
             disabled={isSelected.length == 0}
             onClick={onAddCustomersToCampaign}
