@@ -3,7 +3,6 @@ import { authMiddleware } from '@clerk/nextjs'
 export default authMiddleware({
   publicRoutes: ['/', '/auth(.*)', '/portal(.*)', '/images(.*)', '/favicon.ico'],
   ignoredRoutes: ['/chatbot'],
-
   afterAuth(auth, req) {
     const { pathname } = req.nextUrl;
     const protectedPages = ['/settings', '/conversation', '/dashboard', '/integration', '/integration', '/appointment'];
@@ -14,9 +13,8 @@ export default authMiddleware({
     }
   }
   
-});
 })
 
 export const config = {
   matcher: ['/((?!.+.[w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
-}
+};
