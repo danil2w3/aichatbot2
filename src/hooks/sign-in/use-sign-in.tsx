@@ -28,11 +28,11 @@ export const useSignInForm = () => {
 
         if (authenticated.status === 'complete') {
           await setActive({ session: authenticated.createdSessionId })
-          redirect('/dashboard');
           toast({
             title: 'Success',
             description: 'С возвращением!',
           })
+          redirect('/dashboard');
         }
       } catch (error: any) {
         setLoading(false)
