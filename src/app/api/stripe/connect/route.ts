@@ -21,7 +21,8 @@ export async function GET() {
       );
     }
 
-    const account = await stripe.accounts.create({
+    // Создание аккаунта Stripe
+    const accountPromise = stripe.accounts.create({
       country: 'US',
       type: 'custom',
       business_type: 'company',
@@ -36,7 +37,48 @@ export async function GET() {
       },
     });
 
-    const approve = await stripe.accounts.update(account.id, {
+    // Параллельное выполнение создания персон
+    const createPersonPromise1 = (accountId: string) =>
+      stripe.accounts.createPerson(accountId, {
+        first_name: 'Jenny',
+        last_name: 'Rosen',
+        relationship: {
+          representative: true,
+          title: 'CEO',
+        },
+      });
+
+    const createPersonPromise2 = (accountId: string) =>
+      stripe.accounts.createPerson(accountId, {
+        first_name: 'Kathleen',
+        last_name: 'Banks',
+        email: 'kathleen@bestcookieco.com',
+        address: {
+          city: 'Victoria',
+          line1: '123 State St',
+          postal_code: 'V8P 1A1',
+          state: 'BC',
+        },
+        dob: {
+          day: 10,
+          month: 11,
+          year: 1980,
+        },
+        phone: '8888675309',
+        relationship: {
+          owner: true,
+          percent_ownership: 80,
+        },
+      });
+
+    const [account, person1, person2] = await Promise.all([
+      accountPromise,
+      createPersonPromise1(''),
+      createPersonPromise2(''),
+    ]);
+
+    // Обновление аккаунта и персон
+    const updateAccountPromise = stripe.accounts.update(account.id, {
       business_profile: {
         mcc: '5045',
         url: 'https://bestcookieco.com',
@@ -54,43 +96,7 @@ export async function GET() {
       },
     });
 
-    const person = await stripe.accounts.createPerson(account.id, {
-      first_name: 'Jenny',
-      last_name: 'Rosen',
-      relationship: {
-        representative: true,
-        title: 'CEO',
-      },
-    });
-
-    const approvePerson = await stripe.accounts.updatePerson(
-      account.id,
-      person.id,
-      {
-        address: {
-          city: 'Victoria',
-          line1: '123 State St',
-          postal_code: 'V8P 1A1',
-          state: 'BC',
-        },
-        dob: {
-          day: 10,
-          month: 11,
-          year: 1980,
-        },
-        ssn_last_4: '0000',
-        phone: '8888675309',
-        email: 'jenny@bestcookieco.com',
-        relationship: {
-          executive: true,
-        },
-      }
-    );
-
-    const owner = await stripe.accounts.createPerson(account.id, {
-      first_name: 'Kathleen',
-      last_name: 'Banks',
-      email: 'kathleen@bestcookieco.com',
+    const updatePersonPromise1 = stripe.accounts.updatePerson(account.id, person1.id, {
       address: {
         city: 'Victoria',
         line1: '123 State St',
@@ -102,20 +108,26 @@ export async function GET() {
         month: 11,
         year: 1980,
       },
+      ssn_last_4: '0000',
       phone: '8888675309',
+      email: 'jenny@bestcookieco.com',
       relationship: {
-        owner: true,
-        percent_ownership: 80,
+        executive: true,
       },
     });
 
-    const complete = await stripe.accounts.update(account.id, {
+    // Ожидаем обновления аккаунта и персоны
+    await Promise.all([updateAccountPromise, updatePersonPromise1]);
+
+    // Обновление владельца аккаунта
+    const completeAccountPromise = stripe.accounts.update(account.id, {
       company: {
         owners_provided: true,
       },
     });
 
-    const saveAccountId = await client.user.update({
+    // Сохранение Stripe ID в базе данных
+    const saveAccountIdPromise = client.user.update({
       where: {
         clerkId: user.id,
       },
@@ -124,12 +136,20 @@ export async function GET() {
       },
     });
 
-    const accountLink = await stripe.accountLinks.create({
+    const [completeAccount, saveAccountId] = await Promise.all([
+      completeAccountPromise,
+      saveAccountIdPromise,
+    ]);
+
+    // Создание ссылки для аккаунта
+    const accountLinkPromise = stripe.accountLinks.create({
       account: account.id,
       refresh_url: `${BASE_URL}/callback/stripe/refresh`,
       return_url: `${BASE_URL}/callback/stripe/success`,
       type: 'account_onboarding',
     });
+
+    const accountLink = await accountLinkPromise;
 
     return NextResponse.json({
       url: accountLink.url,
