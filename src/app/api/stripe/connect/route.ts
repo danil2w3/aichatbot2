@@ -9,7 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET!, {
   apiVersion: '2024-04-10',
 });
 
-// const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
 export async function GET() {
   try {
@@ -126,8 +126,8 @@ export async function GET() {
 
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
-      refresh_url: 'http://localhost:3000/callback/stripe/refresh',
-      return_url: 'http://localhost:3000/callback/stripe/success',
+      refresh_url: `${BASE_URL}/callback/stripe/refresh`,
+      return_url: `${BASE_URL}/callback/stripe/success`,
       type: 'account_onboarding',
     });
 
