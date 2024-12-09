@@ -21,8 +21,7 @@ export async function GET() {
       );
     }
 
-    // Создание аккаунта Stripe
-    const accountPromise = stripe.accounts.create({
+    const account = await stripe.accounts.create({
       country: 'US',
       type: 'custom',
       business_type: 'company',
@@ -37,19 +36,20 @@ export async function GET() {
       },
     });
 
-    // Параллельное выполнение создания персон
-    const createPersonPromise1 = (accountId: string) =>
-      stripe.accounts.createPerson(accountId, {
+    if (!account.id) {
+      throw new Error('Account ID is missing after account creation');
+    }
+
+    const createPersonPromises = [
+      stripe.accounts.createPerson(account.id, {
         first_name: 'Jenny',
         last_name: 'Rosen',
         relationship: {
           representative: true,
           title: 'CEO',
         },
-      });
-
-    const createPersonPromise2 = (accountId: string) =>
-      stripe.accounts.createPerson(accountId, {
+      }),
+      stripe.accounts.createPerson(account.id, {
         first_name: 'Kathleen',
         last_name: 'Banks',
         email: 'kathleen@bestcookieco.com',
@@ -69,15 +69,11 @@ export async function GET() {
           owner: true,
           percent_ownership: 80,
         },
-      });
+      })
+    ];
 
-    const [account, person1, person2] = await Promise.all([
-      accountPromise,
-      createPersonPromise1(''),
-      createPersonPromise2(''),
-    ]);
+    const [person1, person2] = await Promise.all(createPersonPromises);
 
-    // Обновление аккаунта и персон
     const updateAccountPromise = stripe.accounts.update(account.id, {
       business_profile: {
         mcc: '5045',
@@ -116,17 +112,14 @@ export async function GET() {
       },
     });
 
-    // Ожидаем обновления аккаунта и персоны
     await Promise.all([updateAccountPromise, updatePersonPromise1]);
 
-    // Обновление владельца аккаунта
     const completeAccountPromise = stripe.accounts.update(account.id, {
       company: {
         owners_provided: true,
       },
     });
 
-    // Сохранение Stripe ID в базе данных
     const saveAccountIdPromise = client.user.update({
       where: {
         clerkId: user.id,
@@ -136,20 +129,14 @@ export async function GET() {
       },
     });
 
-    const [completeAccount, saveAccountId] = await Promise.all([
-      completeAccountPromise,
-      saveAccountIdPromise,
-    ]);
+    await Promise.all([completeAccountPromise, saveAccountIdPromise]);
 
-    // Создание ссылки для аккаунта
-    const accountLinkPromise = stripe.accountLinks.create({
+    const accountLink = await stripe.accountLinks.create({
       account: account.id,
       refresh_url: `${BASE_URL}/callback/stripe/refresh`,
       return_url: `${BASE_URL}/callback/stripe/success`,
       type: 'account_onboarding',
     });
-
-    const accountLink = await accountLinkPromise;
 
     return NextResponse.json({
       url: accountLink.url,
